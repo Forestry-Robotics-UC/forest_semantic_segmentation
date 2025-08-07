@@ -1,0 +1,10 @@
+
+
+# Path to the trained model directory (with config, processor, and weights)
+model_dir: "/path/to/trained_model"
+
+# Directory containing input images to be segmented
+image_dir: "/path/to/input_images"
+
+# Directory where the segmented output images will be saved
+output_dir: "/path/to/output_results"

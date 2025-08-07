@@ -3,31 +3,33 @@ from pprint import pprint
 import torch.nn as nn
 import torch
 import os
+import yaml
 
 
-# Define path to save the new model
-model_path = ""
+# Load YAML config
+with open("/path/to/architecture_modification.yaml", "r") as f:
+    config_yaml = yaml.safe_load(f)
 
 
-# Define list of new semantic classes
-new_classes = [
-    "other", "soil", "trunk", "water",
-    "vegetation", "low_grass", "high_grass", "stone", "stump", "person",
-    "animal", "canopy", "mud"
-]
+
+# Paths and config
+pretrained_model_path = config_yaml["pretrained_model_path"]
+model_path = config_yaml["model_path"]
+
+
+# List of custom semantic classes
+new_classes = config_yaml["new_classes"]
+
+# Original model classes used to initialize weights
+existing_class_map = config_yaml.get("existing_class_map", {})
 
 NUM_CLASSES = len(new_classes)
-
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
 # Load pre-trained model and processor
-processor = OneFormerProcessor.from_pretrained("")
-model = OneFormerForUniversalSegmentation.from_pretrained("").to(device)
+processor = OneFormerProcessor.from_pretrained(pretrained_model_path)
+model = OneFormerForUniversalSegmentation.from_pretrained(pretrained_model_path).to(device)
 
-
-existing_class_map = {}
 
 
 original_id2label = model.config.id2label
