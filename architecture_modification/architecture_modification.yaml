@@ -1,0 +1,34 @@
+
+# Path to the pretrained model (original OneFormer or another compatible one)
+pretrained_model_path: "shi-labs/oneformer_ade20k_dinat_large"
+
+
+# Directory where the new customized model will be saved
+model_path: "/path/to/save/custom_model"
+
+
+# List of new semantic classes
+new_classes:
+  - other
+  - soil
+  - trunk
+  - water
+  - vegetation
+  - low_grass
+  - high_grass
+  - stone
+  - stump
+  - person
+  - animal
+  - canopy
+  - mud
+
+
+# Optional mapping to initialize weights using existing model classes
+existing_class_map:
+  soil: ["dirt", "land, ground, soil"]
+  trunk: "tree trunk"
+  water: "river"
+  vegetation: ["plant", "shrub"]
+  person: "human"
+  animal: ["dog", "cat"]

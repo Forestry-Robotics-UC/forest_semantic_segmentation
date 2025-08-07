@@ -1,0 +1,63 @@
+
+paths:
+  # Directory containing training RGB images
+  train_image_dir: "/path/to/dataset/images/train"
+
+  # Directory containing training segmentation masks (grayscale)
+  train_mask_dir: "/path/to/dataset/masks/train"
+
+  # Directory containing validation RGB images
+  val_image_dir: "/path/to/dataset/images/val"
+
+  # Directory containing validation segmentation masks (grayscale)
+  val_mask_dir: "/path/to/dataset/masks/val"
+
+  # Directory of the base model to be trained
+  model_dir: "/path/to/base/model"
+
+  # Directory to save the newly trained model
+  output_dir: "/path/to/save/trained_model"
+
+
+
+wandb:
+  # Name of the Weights & Biases project for logging experiments
+  project: "project_name"
+
+
+# NOTE: All numeric values must be written in standard decimal form (e.g., 0.001 instead of 1e-3)
+
+optuna:
+  # Number of trials to run for hyperparameter optimization
+  n_trials: 10
+
+  # Definition of the hyperparameter search space
+  hyperparameters:
+    learning_rate:
+      # Minimum learning rate value
+      min: 0.000001
+      # Maximum learning rate value
+      max: 0.0001
+      log: true
+
+    weight_decay:
+      # Minimum weight decay value
+      min: 0.000001
+      # Maximum weight decay value
+      max: 0.001
+      log: true
+
+    batch_size:
+      # List of possible batch sizes to choose from
+      choices: [1, 2]
+
+    num_epochs:
+      # Minimum number of training epochs
+      min: 50
+      # Maximum number of training epochs
+      max: 100
+
+
+# Number of epochs to wait for improvement before early stopping
+early_stopping:
+  patience: 7  

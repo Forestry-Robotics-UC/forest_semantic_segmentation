@@ -1,3 +1,4 @@
+import yaml
 from transformers import OneFormerProcessor, OneFormerForUniversalSegmentation
 import torch.nn.functional as F
 from PIL import Image
@@ -6,17 +7,20 @@ import torch
 import os
 import time
 
+# Load YAML configuration
+with open("/path/to/inference.yaml", "r") as file:
+    config_yaml = yaml.safe_load(file)
 
-# Paths
-model_dir = ""
-image_dir = ""
-output_dir = ""
+# Paths from YAML file
+model_dir = config_yaml["model_dir"]
+image_dir = config_yaml["image_dir"]
+output_dir = config_yaml["output_dir"]
 
-
+# Load model and processor
 model = OneFormerForUniversalSegmentation.from_pretrained(model_dir)
-
-
 processor = OneFormerProcessor.from_pretrained(model_dir)
+
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
