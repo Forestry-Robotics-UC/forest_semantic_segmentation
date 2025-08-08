@@ -36,6 +36,16 @@ The new set of custom semantic classes that was considered is:
 
 
 
+We developed two variants of the proposed method:
+
+- ***forest_dinat_g***: trained exclusively on the [GOOSE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10611298) real-world forest dataset;
+
+- ***forest_dinat_g_cwt***: trained on a combination of the [GOOSE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10611298) real-world forest dataset and the [CWT](https://link.springer.com/article/10.1007/s10514-023-10113-9) real-world non-forest dataset.
+
+
+
+
+
 The provided codes were developed in Python and correspond to the following:
 
 
@@ -149,4 +159,10 @@ The project was implemented and tested on Ubuntu 20.04.
 
 - Make the forest_dinat trained model publicly available;
 
-- Retrain the model, focusing on underrepresented classes such as **stump**, **person**, and **animal**, which were underrepresented in the original training dataset and may cause difficulties in identifying these elements.
+- Retrain the model, focusing on classes such as **stump**, **person**, and **animal**, which were underrepresented in the original training dataset and may cause difficulties in identifying these elements.
+
+
+
+### **Project Video**
+
+[![YouTube](http://i.ytimg.com/vi/pCfJkjTjWHM/hqdefault.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
