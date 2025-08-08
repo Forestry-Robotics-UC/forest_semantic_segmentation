@@ -157,7 +157,7 @@ The project was implemented and tested on Ubuntu 20.04.
 
 - Integrate ROS2 wrapper;
 
-- Make the forest_dinat trained model publicly available;
+- Make the *forest_dinat* trained model publicly available;
 
 - Retrain the model, focusing on classes such as **stump**, **person**, and **animal**, which were underrepresented in the original training dataset and may cause difficulties in identifying these elements.
 
