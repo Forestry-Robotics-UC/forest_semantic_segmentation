@@ -36,7 +36,7 @@ The new set of custom semantic classes that was considered is:
 
 
 
-We developed two variants of the proposed method:
+We developed two variants of the proposed model:
 
 - ***forest_dinat_g***: trained exclusively on the [GOOSE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10611298) real-world forest dataset;
 
@@ -50,7 +50,7 @@ The provided codes were developed in Python and correspond to the following:
 
 
 
-- ***architecture_modification***: Adjusts the classification layer of the referenced method to define a new set of semantic classes;
+- ***architecture_modification***: Adjusts the classification layer of the original method to define a new set of semantic classes;
 
 
 
@@ -165,4 +165,4 @@ The project was implemented and tested on Ubuntu 20.04.
 
 ### **Project Video**
 
-[![YouTube](http://i.ytimg.com/vi/pCfJkjTjWHM/hqdefault.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
+[![YouTube](https://www.youtube.com/watch?v=IFs4Nn2fgKE.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
