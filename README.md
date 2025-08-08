@@ -38,9 +38,9 @@ The new set of custom semantic classes that was considered is:
 
 We developed two variants of the proposed model:
 
-- ***forest_dinat_g***: trained exclusively on the [GOOSE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10611298) real-world forest dataset;
+- ***forest_dinat_g***: trained exclusively on the [GOOSE](https://goose-dataset.de/) real-world forest dataset;
 
-- ***forest_dinat_g_cwt***: trained on a combination of the [GOOSE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10611298) real-world forest dataset and the [CWT](https://link.springer.com/article/10.1007/s10514-023-10113-9) real-world non-forest dataset.
+- ***forest_dinat_g_cwt***: trained on a combination of the [GOOSE](https://goose-dataset.de/) real-world forest dataset and the [CWT](https://gamma.umd.edu/tns/) real-world non-forest dataset.
 
 
 
