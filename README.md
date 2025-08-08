@@ -165,4 +165,4 @@ The project was implemented and tested on Ubuntu 20.04.
 
 ### **Project Video**
 
-[![YouTube](https://www.youtube.com/watch?v=IFs4Nn2fgKE.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
+[![YouTube](https://youtu.be/IFs4Nn2fgKE?t=48.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
