@@ -166,3 +166,11 @@ The project was implemented and tested on Ubuntu 20.04.
 ### **Project Video**
 
 [![YouTube](http://i.ytimg.com/vi/IFs4Nn2fgKE/hqdefault.jpg)](https://www.youtube.com/watch?v=IFs4Nn2fgKE)
+
+
+
+### **Access to Models**
+
+The modified architecture, as well as the ***forest_dinat_g*** and ***forest_dinat_g_cwt*** models, can be downloaded here:
+
+https://drive.google.com/drive/folders/1YSDCQNTqj44fIiFqyNlAtjZ15Ewtp75q?usp=drive_link
