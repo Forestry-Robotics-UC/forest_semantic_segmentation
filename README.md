@@ -68,7 +68,7 @@ The project was implemented and tested on Ubuntu 20.04.
 
 
 
-### **Installation**
+### **Native Installation**
 
 
 
@@ -78,25 +78,50 @@ The project was implemented and tested on Ubuntu 20.04.
 
 
 
-    1. pytorch==2.1.2  
+    1. cuda==12.1  
 
-    2. cuda==12.1  
+    2. natten==0.14.6  
 
-    3. pip install transformers  
+    3. numpy==1.26.2  
 
-    4. pip install natten==0.14.6  
+    4. optuna==4.3.0
 
-    5. pip install scipy  
+    5. pillow==10.0.1
 
-    6. pip install optuna  
+    6. PyYAML==6.0.3
 
-    7. pip install wandb  
+    7. scikit-learn==1.6.1  
 
-    8. pip install scikit-learn 
+    8. scipy==1.15.3  
+
+    9. torch==2.1.2  
+
+    10. transformers==4.51.3 
+
+    11. wandb==0.19.11
 
 
 
 - Sign up for and log in to [Weights & Biases](https://wandb.ai) (W&B) -- optional.
+
+
+
+
+### **Python Virtual Environment Installation**
+
+
+
+- Instead of a native installation, it is possible to use a Python virtual environment and install all required dependencies from the ***requirements.txt*** file. To set it up, follow these steps:
+
+
+    1. python3 -m venv venv_name        
+
+    2. source venv_name/bin/activate    
+
+    3. pip install -r requirements.txt  
+
+    4. deactivate                       
+
 
 
 
