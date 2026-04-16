@@ -8,3 +8,15 @@ image_dir: "/path/to/input_images"
 
 # Directory where the segmented output images will be saved
 output_dir: "/path/to/output_results"
+
+# Resize input to this height before inference (used when keep_input_resolution is false)
+input_height: 640
+
+# Resize input to this width before inference (used when keep_input_resolution is false)
+input_width: 1280
+
+# If true, uses each image original resolution instead of input_height/input_width
+keep_input_resolution: false
+
+# Autocast precision on GPU: fp16, bfloat16, or fp32 (fp32 disables autocast)
+autocast_precision: "bfloat16"

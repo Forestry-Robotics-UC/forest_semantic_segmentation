@@ -1,3 +1,9 @@
+"""Run OneFormer semantic segmentation inference on a folder of images.
+
+The script expects a YAML config with model, input, and output paths.
+It supports configurable inference resolution and autocast precision.
+"""
+
 import yaml
 import argparse
 import sys
@@ -20,6 +26,7 @@ from transformers import OneFormerProcessor, OneFormerForUniversalSegmentation
 
 
 def parse_args():
+    """Parse command-line arguments for the inference runner."""
     default_config = os.environ.get(
         "INFERENCE_CONFIG",
         os.path.join(os.path.dirname(__file__), "inference.yaml"),
@@ -34,6 +41,7 @@ def parse_args():
 
 
 def main():
+    """Load configuration and run semantic segmentation inference."""
     args = parse_args()
     with open(args.config, "r", encoding="utf-8") as file:
         config_yaml = yaml.safe_load(file)
@@ -41,15 +49,40 @@ def main():
     model_dir = config_yaml["model_dir"]
     image_dir = config_yaml["image_dir"]
     output_dir = config_yaml["output_dir"]
+    input_height = int(config_yaml.get("input_height", 640))
+    input_width = int(config_yaml.get("input_width", 1280))
+    keep_input_resolution = bool(config_yaml.get("keep_input_resolution", False))
+    autocast_precision = str(config_yaml.get("autocast_precision", "bfloat16")).lower()
 
     model = OneFormerForUniversalSegmentation.from_pretrained(model_dir)
     processor = OneFormerProcessor.from_pretrained(model_dir)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
+    model.eval()
     config = model.config
+
+    if autocast_precision in {"fp16", "float16"}:
+        autocast_dtype = torch.float16
+        autocast_enabled = device.type == "cuda"
+    elif autocast_precision in {"bf16", "bfloat16"}:
+        autocast_dtype = torch.bfloat16
+        autocast_enabled = device.type == "cuda"
+    elif autocast_precision in {"fp32", "float32", "off", "none"}:
+        autocast_dtype = torch.float32
+        autocast_enabled = False
+    else:
+        raise ValueError(
+            "Unsupported autocast_precision value in config. "
+            "Use one of: fp16, bfloat16, fp32/off."
+        )
 
     print("")
     print(f"Total number of model classes: {config.num_labels}")
+    print(
+        "Inference preprocessing: "
+        f"{'original image size' if keep_input_resolution else f'{input_width}x{input_height}'}"
+    )
+    print(f"Autocast precision: {autocast_precision}")
 
     custom_palette = np.array([
         [0, 0, 0], [120, 120, 70], [255, 170, 146], [61, 230, 250], [204, 255, 4], [4, 250, 7], [12, 189, 102],
@@ -64,17 +97,20 @@ def main():
     )
     for filename in tqdm(image_filenames, desc="Inference"):
         image_path = os.path.join(image_dir, filename)
-        image = Image.open(image_path)
+        image = Image.open(image_path).convert("RGB")
 
         print("")
         print(f"Image mode: {image.mode}")
 
-        # Keep processor resolution aligned with input image to reduce memory pressure.
-        processor.image_processor.size = {"height": image.height, "width": image.width}
+        # Keep default preprocessing aligned with training unless explicitly overridden.
+        if keep_input_resolution:
+            processor.image_processor.size = {"height": image.height, "width": image.width}
+        else:
+            processor.image_processor.size = {"height": input_height, "width": input_width}
+
         inputs = processor(images=image, task_inputs=["semantic"], return_tensors="pt").to(device)
         with torch.no_grad():
-            model.eval()
-            with torch.autocast(device_type="cuda", dtype=torch.float16, enabled=(device.type == "cuda")):
+            with torch.autocast(device_type="cuda", dtype=autocast_dtype, enabled=autocast_enabled):
                 outputs = model(**inputs)
 
         segmentation_mask = processor.post_process_semantic_segmentation(outputs, target_sizes=[image.size[::-1]])[0]

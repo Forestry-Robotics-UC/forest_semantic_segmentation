@@ -159,7 +159,54 @@ TORCH_INDEX_URL=https://download.pytorch.org/whl/cu128 docker compose build --no
 - Notes for RTX 5000 / Blackwell:
   1. This repo includes a local `natten` compatibility module (`natten/functional.py`) used by the scripts.
   2. It avoids legacy NATTEN binary incompatibilities on Blackwell GPUs, but it is slower than fused NATTEN kernels.
-  3. Inference uses dynamic input size and CUDA autocast to reduce memory pressure.
+  3. Inference defaults to training-aligned preprocessing size (`1280x640`) and supports configurable autocast precision (`fp16`, `bfloat16`, `fp32`) in `inference/inference.yaml`.
+
+
+### **Quick Commands (Docker Inference)**
+
+- Build image:
+
+```bash
+cd /home/forestsphere/work_utils/forest_semantic_segmentation
+docker compose build
+```
+
+- Run inference with your local config file:
+
+```bash
+cd /home/forestsphere/work_utils/forest_semantic_segmentation
+docker compose run --rm \
+  -v /path/to/model:/model:ro \
+  -v /path/to/images:/images:ro \
+  -v /path/to/output:/output \
+  forest-seg \
+  python3 inference/inference.py --config inference/inference.yaml
+```
+
+- Optional memory tuning for Blackwell laptops:
+
+```bash
+PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True,max_split_size_mb:64" docker compose run --rm ...
+```
+
+
+### **Troubleshooting (Blackwell / Docker)**
+
+- `torch.OutOfMemoryError`:
+  - Use `autocast_precision: "bfloat16"` in `inference/inference.yaml`.
+  - Keep training-aligned resize (`input_width: 1280`, `input_height: 640`).
+  - Optionally set `PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True,max_split_size_mb:64"`.
+
+- `cp: -r not specified; omitting directory`:
+  - The source path is a directory. Use `cp -r source_dir target_dir`.
+
+- `bash: syntax error near unexpected token '('`:
+  - A heredoc was likely malformed. Ensure the closing marker has no indentation.
+
+- Output looks stale or wrong:
+  - Clear output folder before each run.
+  - Confirm `image_dir` in YAML matches the mounted path.
+  - Check the runtime log line `Identified classes: [...]`.
 
 
 

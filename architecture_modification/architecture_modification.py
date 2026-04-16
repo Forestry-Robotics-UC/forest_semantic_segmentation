@@ -1,3 +1,8 @@
+"""Adapt a pretrained OneFormer head to a custom forest label space.
+
+This script rewires the classifier head and updates processor/config label maps.
+"""
+
 import argparse
 import os
 import sys
@@ -19,6 +24,7 @@ from transformers import OneFormerForUniversalSegmentation, OneFormerProcessor
 
 
 def parse_args():
+    """Parse command-line arguments for architecture adaptation."""
     default_config = os.environ.get(
         "ARCHITECTURE_MODIFICATION_CONFIG",
         os.path.join(os.path.dirname(__file__), "architecture_modification.yaml"),
@@ -33,6 +39,7 @@ def parse_args():
 
 
 def main():
+    """Create and save a class-adapted OneFormer checkpoint."""
     args = parse_args()
     with open(args.config, "r", encoding="utf-8") as f:
         config_yaml = yaml.safe_load(f)

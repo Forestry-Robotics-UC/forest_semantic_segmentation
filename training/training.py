@@ -1,3 +1,9 @@
+"""Train OneFormer for custom forest semantic segmentation.
+
+The script runs Optuna hyperparameter search, logs metrics to Weights & Biases,
+and exports the best checkpoint according to validation loss.
+"""
+
 import os
 import argparse
 import sys
@@ -26,11 +32,13 @@ from transformers import OneFormerForUniversalSegmentation, OneFormerProcessor
 
 # ========== Load Configuration ==========
 def load_config(config_path):
-    with open(config_path, "r") as file:
+    """Load and parse a YAML configuration file."""
+    with open(config_path, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
 
 def parse_args():
+    """Parse command-line arguments for the training runner."""
     default_config = os.environ.get(
         "TRAINING_CONFIG",
         os.path.join(os.path.dirname(__file__), "training.yaml"),
@@ -81,6 +89,7 @@ global_best_metrics = {
 
 
 def save_global_best(trial_loss, model_state, epoch, val_iou, train_loss, train_iou, encoder_frozen_epochs, encoder_unfrozen_epochs):
+    """Store metrics and weights for the best trial seen so far."""
     global global_best_val_loss, global_best_state, global_best_metrics
     global global_encoder_frozen_epochs, global_encoder_unfrozen_epochs
 
@@ -96,8 +105,8 @@ def save_global_best(trial_loss, model_state, epoch, val_iou, train_loss, train_
         global_encoder_unfrozen_epochs = encoder_unfrozen_epochs
 
 
-# Function to check if all images have a corresponding mask
-def verify(image_dir, mask_dir, str, prefix_mask="new_classes_"):
+def verify(image_dir, mask_dir, split_name, prefix_mask="new_classes_"):
+    """Verify that each image in a split has a corresponding segmentation mask."""
     image_files = sorted([f for f in os.listdir(image_dir) if f.lower().endswith(('jpg', 'jpeg', 'png', 'tif'))])
     missing_masks = []
     for img_file in image_files:
@@ -108,19 +117,20 @@ def verify(image_dir, mask_dir, str, prefix_mask="new_classes_"):
             missing_masks.append(expected_mask)
 
     print("")
-    print(f"Total images for {str}: {len(image_files)}")
+    print(f"Total images for {split_name}: {len(image_files)}")
     print(f"Missing masks: {len(missing_masks)}")
     if missing_masks:
         print("Examples of missing masks:")
         for m in missing_masks[:5]:
             print(f"- {m}")
     else:
-        print(f"All images for {str} have corresponding masks!")
+        print(f"All images for {split_name} have corresponding masks!")
 
 
 
-# Dataset
 class SegmentationDataset(Dataset):
+    """Dataset wrapper that pairs RGB images with class-index masks."""
+
     def __init__(self, image_dir, mask_dir, processor):
         self.image_files = sorted([f for f in os.listdir(image_dir) if f.lower().endswith(('jpg', 'jpeg', 'png', 'tif'))])
         self.image_paths = [os.path.join(image_dir, f) for f in self.image_files]
@@ -150,6 +160,7 @@ class SegmentationDataset(Dataset):
 
 # Main training function for Optuna
 def train_oneformer(trial):
+    """Run one Optuna trial for OneFormer training and validation."""
     global wandb_project, hyperparams
 
     lr = trial.suggest_float(
