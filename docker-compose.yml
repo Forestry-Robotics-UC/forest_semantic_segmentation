@@ -1,0 +1,21 @@
+services:
+  forest-seg:
+    build:
+      context: .
+      dockerfile: Dockerfile.blackwell
+      args:
+        TORCH_INDEX_URL: ${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu128}
+    image: forest-seg:blackwell
+    container_name: forest-seg-blackwell
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    ipc: host
+    shm_size: "16gb"
+    gpus: all
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./:/workspace

@@ -1,4 +1,6 @@
 import os
+import argparse
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,33 +10,58 @@ import numpy as np
 import optuna
 import wandb
 from tqdm import tqdm
-from transformers import OneFormerForUniversalSegmentation, OneFormerProcessor
 from sklearn.metrics import jaccard_score
 import yaml
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+import transformers.utils.import_utils as tf_import_utils
+
+tf_import_utils._natten_available = True
+
+from transformers import OneFormerForUniversalSegmentation, OneFormerProcessor
+
 
 # ========== Load Configuration ==========
-def load_config(config_path="/path/to/training.yaml"):
+def load_config(config_path):
     with open(config_path, "r") as file:
         return yaml.safe_load(file)
 
-config = load_config()
+
+def parse_args():
+    default_config = os.environ.get(
+        "TRAINING_CONFIG",
+        os.path.join(os.path.dirname(__file__), "training.yaml"),
+    )
+    parser = argparse.ArgumentParser(description="Train OneFormer model for forest segmentation.")
+    parser.add_argument(
+        "--config",
+        default=default_config,
+        help="Path to training.yaml (default: %(default)s)",
+    )
+    return parser.parse_args()
+
+
+args = parse_args()
+app_config = load_config(args.config)
 
 # Paths from YAML
-train_image_dir = config["paths"]["train_image_dir"]
-train_mask_dir = config["paths"]["train_mask_dir"]
-val_image_dir = config["paths"]["val_image_dir"]
-val_mask_dir = config["paths"]["val_mask_dir"]
-model_dir = config["paths"]["model_dir"]
-output_dir = config["paths"]["output_dir"]
+train_image_dir = app_config["paths"]["train_image_dir"]
+train_mask_dir = app_config["paths"]["train_mask_dir"]
+val_image_dir = app_config["paths"]["val_image_dir"]
+val_mask_dir = app_config["paths"]["val_mask_dir"]
+model_dir = app_config["paths"]["model_dir"]
+output_dir = app_config["paths"]["output_dir"]
 
 # Wandb & Optuna
-wandb_project = config["wandb"]["project"]
-n_trials = config["optuna"]["n_trials"]
-hyperparams = config["optuna"]["hyperparameters"]
+wandb_project = app_config["wandb"]["project"]
+n_trials = app_config["optuna"]["n_trials"]
+hyperparams = app_config["optuna"]["hyperparameters"]
 
 # Early stopping
-patience = config["early_stopping"]["patience"]
+patience = app_config["early_stopping"]["patience"]
 
 # Device
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -123,7 +150,7 @@ class SegmentationDataset(Dataset):
 
 # Main training function for Optuna
 def train_oneformer(trial):
-    global wandb_project, config, hyperparams
+    global wandb_project, hyperparams
 
     lr = trial.suggest_float(
         "lr",
@@ -158,10 +185,10 @@ def train_oneformer(trial):
     model = OneFormerForUniversalSegmentation.from_pretrained(model_dir, ignore_mismatched_sizes=True).to(device)
    
     # Access model configuration
-    config = model.config
+    model_config = model.config
 
     # Check number of classes
-    print(f"Number of classes: {config.num_labels}")
+    print(f"Number of classes: {model_config.num_labels}")
 
 
     # Check if images have corresponding masks
@@ -180,7 +207,6 @@ def train_oneformer(trial):
 
     best_val_loss = float('inf')
     encoder_unfrozen = True
-    patience = config["early_stopping"]["patience"]
     counter = 0
     encoder_frozen_epochs = 0
     encoder_unfrozen_epochs = 0

@@ -122,6 +122,45 @@ pip install -r requirements.txt
 ```                     
 
 
+### **Docker Compose (NVIDIA RTX 5000 / Blackwell)**
+
+- A Blackwell-oriented container runtime is provided with:
+  1. `Dockerfile.blackwell`
+  2. `docker-compose.yml`
+  3. `requirements.blackwell.txt`
+
+- Build the image:
+
+```bash
+cd /home/forestsphere/work_utils/forest_semantic_segmentation
+docker compose build
+```
+
+- Open a shell in the GPU container:
+
+```bash
+docker compose run --rm forest-seg
+```
+
+- Inside the container, run each stage with explicit config files:
+
+```bash
+python3 architecture_modification/architecture_modification.py --config architecture_modification/architecture_modification.yaml
+python3 training/training.py --config training/training.yaml
+python3 inference/inference.py --config inference/inference.yaml
+```
+
+- Optional: if you need a different PyTorch CUDA wheel channel, set:
+
+```bash
+TORCH_INDEX_URL=https://download.pytorch.org/whl/cu128 docker compose build --no-cache
+```
+
+- Notes for RTX 5000 / Blackwell:
+  1. This repo includes a local `natten` compatibility module (`natten/functional.py`) used by the scripts.
+  2. It avoids legacy NATTEN binary incompatibilities on Blackwell GPUs, but it is slower than fused NATTEN kernels.
+  3. Inference uses dynamic input size and CUDA autocast to reduce memory pressure.
+
 
 
 ### **Notes**
